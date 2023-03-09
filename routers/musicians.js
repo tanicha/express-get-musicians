@@ -17,7 +17,7 @@ router.get('/:id', async (request, response) => {
 });
 
 //post request for adding musicians 
-router.post('/', [check("name").not().isEmpty().trim(), check("instrument").not().isEmpty().trim()], async (request, response) => {
+router.post('/', [check("name").not().isEmpty().trim(), check("instrument").not().isEmpty().trim(), check("name").isLength({min: 2, max: 20})], async (request, response) => {
     const errors = validationResult(request)
     if (!errors.isEmpty()){
         response.json({errors: errors.array()})
