@@ -1,7 +1,8 @@
 const express = require('express');
-const router = express.Router();
 const {Musician} = require("../Musician");
 const {sequelize} = require("../db");
+const router = express.Router();
+const {check, validationResult} = require('express-validator')
 
 //TODO
 router.get('/', async (request, response) => {
@@ -16,9 +17,18 @@ router.get('/:id', async (request, response) => {
 });
 
 //post request for adding musicians 
-router.post('/', async (request, response) => {
-    const newMusician = await Musician.create(request.body)
-    response.json(newMusician)
+router.post('/', [check("name").not().isEmpty().trim(), check("instrument").not().isEmpty().trim()], async (request, response) => {
+    const errors = validationResult(request)
+    if (!errors.isEmpty()){
+        response.json({errors: errors.array()})
+    } else {
+        await Musician.create({
+            name: request.body.name,
+            instrument: request.body.instrument 
+        })
+        const allMusicians = await Musician.findAll()
+        response.json(allMusicians)
+    }
 });
 
 //put request for updating musician by id
